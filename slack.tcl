@@ -21,10 +21,18 @@ json::write indented 0
 
 # define the slack namespace and all variables that must be defined and non-empty in config.yml
 namespace eval slack {
+
     namespace eval incomingwebhook {
         variable url {}
         variable token {}
     }
+
+    namespace eval channel {
+        variable mapping {}
+        variable command_prefix {}
+    }
+
+    set optional {::slack::channel::command_prefix}
 }
 
 
@@ -58,10 +66,12 @@ proc ::slack::processConfig {} {
         # loop through each declared variable in the namespace, and add any missing keys to the list of them
         foreach {key} [listnsvars $subNamespaceName] {
 
-            if { [subst $$key] == "" } {
+            # do not add if the key is optional
+            if { [subst $$key] == "" && [lsearch $::slack::optional $key] == -1} {
                 lappend missingKeys $key
             }
         }
+       
     }
 
     if { [llength $missingKeys] } {
@@ -70,10 +80,24 @@ proc ::slack::processConfig {} {
     }
 }
 
+proc ::slack::channel::exists {channel} {
+    return [dict exists $slack::channel::map $channel]
+}
+
+proc ::slack::channel::ircToSlack {irc} {
+    return [dict get $slack::channel::map $irc]
+}
+
+proc ::slack::channel::isCommand {msg} {
+    foreach {prefix} [split $::slack::channel::command_prefix ","] {
+        if { [string first $prefix $msg] == 0 } {
+            return 1
+        }
+    }
+    return 0
+}
+
 ::slack::processConfig
-
-exit
-
 
 set slack(push) {
     url $::slack::incomingwebhook::url
@@ -85,3 +109,4 @@ set slack(push) {
 set slack(push) [subst $slack(push)]
 
 rest::create_interface slack
+

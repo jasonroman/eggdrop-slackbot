@@ -1,3 +1,18 @@
+# url and token for the incoming-webhook
 incomingwebhook:
     url:   https://yoursite.slack.com/services/hooks/incoming-webhook
-    token: 
+    token: {}
+
+# irc channel settings
+channel:
+    # channel map - text from the irc channel will get pushed to the corresponding slack channel
+    # simply leave out any irc channels that you do not want to push to slack
+    mapping:
+        # format: <irc_channel>: <slack_channel>
+        "#lounge": "#general"
+        "#random": "#random"
+
+    # prefixes for bot commands that will not be echoed to slack; for instance, if you set 
+    # a command prefix of "!c", then "!test" will be pushed to slack but "!cmd" will not
+    # leave blank to echo all messages to slack
+    command_prefix: "!,*"

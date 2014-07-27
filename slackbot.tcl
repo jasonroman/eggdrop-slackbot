@@ -20,21 +20,29 @@ bind pubm - * pub_slackpush
 # pushes a chat message to slack
 proc pub_slackpush {nick mask hand channel args} {
 
-    set message [lindex $args 0]
+    set msg [lindex $args 0]
 
-    if { $channel != "#PAPHPPeople" } {
+    # if there is no mapping for this channel to slack, do not echo
+    if { ![::slack::channel::mappingExists $channel] } {
         return 0
     }
 
-    if { [string index $message 0] == "!" } {
+    # if this is a bot command, do not echo
+    if { [::slack::channel::isCommand $msg] } {
         return 0
     }
 
     # get the name of the task (everything after the command)
-    set text [json::write string $message]
-    set username [json::write string $nick]
-    set slack_channel [json::write string $channel]
-    set payload [json::write object text $text username $username unfurl_links \"true\"]
+    #set txt [json::write string $msg]
+    #set username [json::write string $nick]
+    #set slackChannel [json::write string [::slack::channel::ircToSlack $channel]]
+    set payload [
+        json::write object
+        "text" [json::write string $msg]
+        username [json::write string $nick]
+        channel [json::write string [::slack::channel::ircToSlack $channel]]
+        unfurl_links \"true\"
+    ]
 
     set result [slack::push -payload $payload]
 }
