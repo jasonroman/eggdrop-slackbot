@@ -7,13 +7,15 @@
 ##############################################################################
 
 # get the directory of where this script is located
-set script_dir [file dirname [info script]]
+set SlackbotScriptDir [file dirname [info script]]
 
 # load slack functionality
-source [file join $script_dir slack.tcl]
+source [file join $SlackbotScriptDir utility.tcl]
+source [file join $SlackbotScriptDir slack.tcl]
 
 # listen for any and all text in the channel to forward
 bind pubm - * pub_slackpush
+
 
 # pushes a chat message to slack
 proc pub_slackpush {nick mask hand channel args} {

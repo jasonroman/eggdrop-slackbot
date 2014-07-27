@@ -1,0 +1,3 @@
+incomingwebhook:
+    url:   https://yoursite.slack.com/services/hooks/incoming-webhook
+    token: 
