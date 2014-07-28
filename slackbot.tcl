@@ -41,7 +41,7 @@ proc pub_slackpush {nick mask hand channel args} {
         "text" [json::write string $msg]
         username [json::write string $nick]
         channel [json::write string [::slack::channel::ircToSlack $channel]]
-        unfurl_links [json::write string "true"]
+        unfurl_links [json::write string [::slack::incomingwebhook::unfurl_links]
     ]
 
     set result [slack::push -payload $payload]
