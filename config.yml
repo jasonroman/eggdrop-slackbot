@@ -1,9 +1,14 @@
-# url and token for the incoming-webhook
+# incoming webhook settings
 incomingwebhook:
+    # url and token for the incoming-webhook
     url:   https://yoursite.slack.com/services/hooks/incoming-webhook
-    token: {}
+    token: yourtoken
 
-# irc channel settings
+    # whether or not to automatically unfurl links in slack; links such as
+    # youtube/twitter/flicker/xkcd will do unfurl regardless of the setting
+    unfurl_links: "true"
+
+# irc settings
 channel:
     # channel map - text from the irc channel will get pushed to the corresponding slack channel
     # simply leave out any irc channels that you do not want to push to slack
@@ -15,4 +20,4 @@ channel:
     # prefixes for bot commands that will not be echoed to slack; for instance, if you set 
     # a command prefix of "!c", then "!test" will be pushed to slack but "!cmd" will not
     # leave blank to echo all messages to slack
-    command_prefix: "!,*"
+    command_prefix: "!"
