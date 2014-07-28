@@ -39,7 +39,7 @@ namespace eval slack {
 
 # processes the slack configuration file
 #
-# @return 1|exit 1 on success, exit on failure
+# @return true|exit - 1 on success, exit on failure
 proc ::slack::processConfig {} {
 
     global SlackbotScriptDir
@@ -66,7 +66,7 @@ proc ::slack::processConfig {} {
         foreach {key} [listnsvars $subNamespaceName] {
 
             # add to the missing keys if the value is blank and the key is required
-            if { [subst $$key] == "" && [lsearch $::slack::optional $key] == -1} {
+            if {[subst $$key] == "" && [lsearch $::slack::optional $key] == -1} {
                 lappend missingKeys $key
             }
         }
@@ -74,7 +74,7 @@ proc ::slack::processConfig {} {
     }
 
     # notify the user of what required values are missing and stop execution
-    if { [llength $missingKeys] } {
+    if {[llength $missingKeys]} {
         puts "Undefined configuration variables: \n[join $missingKeys \n]"
         exit
     }
@@ -93,9 +93,14 @@ proc ::slack::channel::mappingExists {channel} {
 # retrieve the name of the slack channel that correspondings to the irc channel
 #
 # @param string channel
-# @return string 
+# @return string|false - slack channel if exists, 0 if it does not
 proc ::slack::channel::ircToSlack {channel} {
-    return [dict get $slack::channel::map $channel]
+
+    if {[::slack::channel::mappingExists $channel]} {
+        return [dict get $slack::channel::map $channel]
+    }
+
+    return 0
 }
 
 # check if the given irc message is a command
@@ -103,11 +108,13 @@ proc ::slack::channel::ircToSlack {channel} {
 # @param string msg
 # @return bool
 proc ::slack::channel::isCommand {msg} {
+    # if the message starts with any of the specified prefixes, it is considered a command
     foreach {prefix} [split $::slack::channel::command_prefix ","] {
-        if { [string first $prefix $msg] == 0 } {
+        if {[string first $prefix $msg] == 0} {
             return 1
         }
     }
+
     return 0
 }
 

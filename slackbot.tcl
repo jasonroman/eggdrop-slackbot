@@ -23,12 +23,12 @@ proc pub_slackpush {nick mask hand channel args} {
     set msg [lindex $args 0]
 
     # if there is no mapping for this channel to slack, do not echo
-    if { ![::slack::channel::mappingExists $channel] } {
+    if {![::slack::channel::mappingExists $channel]} {
         return 0
     }
 
     # if this is a bot command, do not echo
-    if { [::slack::channel::isCommand $msg] } {
+    if {[::slack::channel::isCommand $msg]} {
         return 0
     }
 
