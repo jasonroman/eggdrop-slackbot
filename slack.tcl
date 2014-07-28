@@ -122,9 +122,6 @@ proc ::slack::channel::isCommand {msg} {
 # process the configuration file to setup the slack parameters
 ::slack::processConfig
 
-puts $::slack::incomingwebhook::unfurl_links
-
-exit
 # set the rest command to push data to slack via the incoming webhook
 set slack(push) {
     url $::slack::incomingwebhook::url
