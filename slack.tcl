@@ -36,37 +36,35 @@ namespace eval slack {
 }
 
 
-# processes the configuration file for slack
+# processes the slack configuration file
+#
+# @return 1|exit 1 on success, exit on failure
 proc ::slack::processConfig {} {
 
     global SlackbotScriptDir
 
-    # load config.yml in the script's directory into the 'config' dictionary
+    # load config.yml in the script's directory into the config dictionary
     set config [yaml::yaml2dict -file [file join $SlackbotScriptDir config.yml]]
 
-    # loop through each top level key in the config
+    # loop through all config values and set their corresponding namespace variable
     dict for {topLevelKey subDict} [dict get $config] {
-
-        # now loop through each key/value pair of that key
         dict for {key value} [dict get $subDict] {
 
-            # check if we previously defined this variable in our namespace declaration, and if so, set its value
+            # check if the key is previously defined in our namespace declaration; if so, set its value
             if {[info exists ::slack::${topLevelKey}::$key]} {
                 set ::slack::${topLevelKey}::$key $value
             }
         }
     }
 
-    # all namespace parameters must be defined with a non-empty value - exit if any are missing
+    # all required namespace parameters must be defined with a non-empty value - exit if any are missing
     set missingKeys {}
 
-    # loop through each sub-namespace here (::slack::*)
+    # loops through each sub-namespace here (::slack::*) and every declared namespace variable
     foreach {subNamespaceName} [listns slack] {
-
-        # loop through each declared variable in the namespace, and add any missing keys to the list of them
         foreach {key} [listnsvars $subNamespaceName] {
 
-            # do not add if the key is optional
+            # add to the missing keys if the value is blank and the key is required
             if { [subst $$key] == "" && [lsearch $::slack::optional $key] == -1} {
                 lappend missingKeys $key
             }
@@ -74,20 +72,35 @@ proc ::slack::processConfig {} {
        
     }
 
+    # notify the user of what required values are missing and stop execution
     if { [llength $missingKeys] } {
         puts "Undefined configuration variables: \n[join $missingKeys \n]"
         exit
     }
+
+    return 1
 }
 
-proc ::slack::channel::exists {channel} {
+# check if a mapping exists from the given irc channel to a corresponding slack channel
+#
+# @param string channel
+# @return bool
+proc ::slack::channel::mappingExists {channel} {
     return [dict exists $slack::channel::map $channel]
 }
 
-proc ::slack::channel::ircToSlack {irc} {
-    return [dict get $slack::channel::map $irc]
+# retrieve the name of the slack channel that correspondings to the irc channel
+#
+# @param string channel
+# @return string 
+proc ::slack::channel::ircToSlack {channel} {
+    return [dict get $slack::channel::map $channel]
 }
 
+# check if the given irc message is a command
+#
+# @param string msg
+# @return bool
 proc ::slack::channel::isCommand {msg} {
     foreach {prefix} [split $::slack::channel::command_prefix ","] {
         if { [string first $prefix $msg] == 0 } {
@@ -97,8 +110,11 @@ proc ::slack::channel::isCommand {msg} {
     return 0
 }
 
+
+# process the configuration file to setup the slack parameters
 ::slack::processConfig
 
+# set the rest command to push data to slack via the incoming webhook
 set slack(push) {
     url $::slack::incomingwebhook::url
     method post
@@ -106,7 +122,9 @@ set slack(push) {
     req_args { payload: }
 }
 
+# make sure the variables are substituted with their appropriate values
 set slack(push) [subst $slack(push)]
 
+# create the interface for all slack rest commands
 rest::create_interface slack
 
