@@ -1,6 +1,6 @@
 ##############################################################################
 #
-# Eggdrop Slackbot
+# Eggdrop Slackbot - Simpmle IRC to Slack Relay
 #
 # @author Jason Roman <j@jayroman.com>
 #
@@ -32,16 +32,13 @@ proc pub_slackpush {nick mask hand channel args} {
         return 0
     }
 
-    # get the name of the task (everything after the command)
-    #set txt [json::write string $msg]
-    #set username [json::write string $nick]
-    #set slackChannel [json::write string [::slack::channel::ircToSlack $channel]]
+    # set the JSON payload and push it to slack
     set payload [
-        json::write object
-        "text" [json::write string $msg]
-        username [json::write string $nick]
-        channel [json::write string [::slack::channel::ircToSlack $channel]]
-        unfurl_links [json::write string [::slack::incomingwebhook::unfurl_links]
+        ::json::write object \
+        text [json::write string $msg] \
+        username [json::write string $nick] \
+        channel [json::write string [::slack::channel::ircToSlack $channel]] \
+        unfurl_links [json::write string $::slack::webhook::unfurl_links]
     ]
 
     set result [slack::push -payload $payload]

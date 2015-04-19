@@ -14,7 +14,7 @@ package require json::write
 package require yaml
 
 # add https support
-http::register https 443 ::tls::socket
+http::register https 443 [list ::tls::socket -tls1 true]
 
 # do not add newlines in json - keep it condensed
 json::write indented 0
@@ -22,9 +22,8 @@ json::write indented 0
 # define the slack namespace and all variables that must be defined and non-empty in config.yml
 namespace eval slack {
 
-    namespace eval incomingwebhook {
+    namespace eval webhook {
         variable url {}
-        variable token {}
         variable unfurl_links {true}
     }
 
@@ -87,7 +86,7 @@ proc ::slack::processConfig {} {
 # @param string channel
 # @return bool
 proc ::slack::channel::mappingExists {channel} {
-    return [dict exists $slack::channel::map $channel]
+    return [dict exists $slack::channel::mapping $channel]
 }
 
 # retrieve the name of the slack channel that correspondings to the irc channel
@@ -97,7 +96,7 @@ proc ::slack::channel::mappingExists {channel} {
 proc ::slack::channel::ircToSlack {channel} {
 
     if {[::slack::channel::mappingExists $channel]} {
-        return [dict get $slack::channel::map $channel]
+        return [dict get $slack::channel::mapping $channel]
     }
 
     return 0
@@ -122,11 +121,10 @@ proc ::slack::channel::isCommand {msg} {
 # process the configuration file to setup the slack parameters
 ::slack::processConfig
 
-# set the rest command to push data to slack via the incoming webhook
+# set the REST command to push data to slack via the webhook
 set slack(push) {
-    url $::slack::incomingwebhook::url
+    url $::slack::webhook::url
     method post
-    static_args { token $::slack::incomingwebhook::token }
     req_args { payload: }
 }
 
@@ -135,4 +133,3 @@ set slack(push) [subst $slack(push)]
 
 # create the interface for all slack rest commands
 rest::create_interface slack
-
