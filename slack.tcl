@@ -13,8 +13,8 @@ package require tls
 package require json::write
 package require yaml
 
-# add https support
-http::register https 443 [list ::tls::socket -tls1 true]
+# add https support - force TLS, no longer use SSLv3 (POODLE exploit)
+http::register https 443 [list ::tls::socket -tls1 true -ssl2 false -ssl3 false]
 
 # do not add newlines in json - keep it condensed
 json::write indented 0

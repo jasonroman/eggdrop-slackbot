@@ -1,6 +1,6 @@
 ##############################################################################
 #
-# Eggdrop Slackbot - Simpmle IRC to Slack Relay
+# Eggdrop Slackbot - Simple Message Relay from IRC to Slack
 #
 # @author Jason Roman <j@jayroman.com>
 #
