@@ -18,6 +18,9 @@ channel:
         "#secret": "myprivategroup"
 
     # prefixes for bot commands that will not be echoed to slack; for instance, if you set 
-    # a command prefix of "!c", then "!test" will be pushed to slack but "!cmd" will not
-    # leave blank to echo all messages to slack
-    command_prefix: "!"
+    # a command prefix of "!c", then "!test" will be pushed to slack but "!cmd" will not.
+    #
+    # multiple prefixes can be defined by a comma-separated list
+    #
+    # use "" to echo all messages to slack regardless
+    command_prefix: "!, *"
