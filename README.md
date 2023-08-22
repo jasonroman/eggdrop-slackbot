@@ -5,7 +5,7 @@ This is an IRC Eggdrop Bot that interacts with [Slack](https://slack.com/).  It'
 
 ### Slack Setup
 
-Go to your Slack Integrations and add an Incoming Webhook (if you are already using one this will be listed under the Configured Integrations tab instead of All Services).  Under* Integration Settings -> Post to Channel*, just select **#general** or any existing channel as the message relay will ignore this anyway.  Under Customize Name this similarly does not matter as the relay will be posting messages as IRC users instead of the name you give it.
+Go to your Slack Integrations and add an Incoming Webhook (if you are already using one this will be listed under the Configured Integrations tab instead of All Services).  Under *Integration Settings -> Post to Channel*, just select **#general** or any existing channel as the message relay will ignore this anyway.  Under Customize Name this similarly does not matter as the relay will be posting messages as IRC users instead of the name you give it.
 
 The relevant field you will need for the bot setup is the Webhook URL.
 
@@ -36,7 +36,7 @@ Notice how it ignores the Slack Integration's Customize Name setting and uses th
 
 The **#** is required when specifying the IRC channel, but you may include or exclude it when specifying the Slack channel (this is true for both public channels and private groups, even though Slack does not show **#** for private groups).
 
-One other feature is the ability to not relay bot commands.  For instance, your eggdrop bot might support commands that start with ***** or **!**, like ***quote** or **!thetime**, and you may not want that command or its results to show up in Slack.  You can ignore messages that begin with one or more prefixes by specifying them in your config file.  For the situation above, you would specify it as:
+One other feature is the ability to not relay bot commands.  For instance, your eggdrop bot might support commands that start with * or **!**, like ***quote** or **!thetime**, and you may not want that command or its results to show up in Slack.  You can ignore messages that begin with one or more prefixes by specifying them in your config file.  For the situation above, you would specify this as:
 
     channel:
         command_prefix: "!, *"
